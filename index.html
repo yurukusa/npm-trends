@@ -88,6 +88,7 @@ const COLORS = ['#58a6ff','#3fb950','#d2a8ff','#f0883e','#f778ba'];
 
 // --- State ---
 let pkgData = {}; // { name: [{day,downloads},...] }
+let pkgOrder = []; // preserve input order for consistent coloring
 let currentPeriod = 'last-year';
 let chartPoints = []; // for hover: [{x,y,pkg,day,downloads}]
 
@@ -149,6 +150,7 @@ async function runComparison() {
   chartWrap.style.display = 'none';
   tableWrap.innerHTML = '';
   pkgData = {};
+  pkgOrder = names;
 
   const errors = [];
   await Promise.all(names.map(async (name) => {
@@ -188,7 +190,7 @@ function drawChart() {
 
   ctx.clearRect(0, 0, W, H);
 
-  const pkgNames = Object.keys(pkgData);
+  const pkgNames = pkgOrder.filter(n => n in pkgData);
   if (!pkgNames.length) return;
 
   // Determine global max and date range
@@ -324,7 +326,7 @@ canvas.addEventListener('mouseleave', () => { tooltipEl.style.display = 'none'; 
 
 // --- Summary table ---
 function drawTable() {
-  const pkgNames = Object.keys(pkgData);
+  const pkgNames = pkgOrder.filter(n => n in pkgData);
   if (!pkgNames.length) { tableWrap.innerHTML = ''; return; }
 
   let rows = '';
